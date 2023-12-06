@@ -3,3 +3,6 @@ README.html
 README_files/
 .Rproj.user
 .Rhistory
+.ipynb_checkpoints
+*.html
+*_files/
