@@ -1,0 +1,76 @@
+---
+title: 【課題】Rでのグラフ作成の基礎
+format: html
+keep-ipynb: true
+jupyter:
+  jupytext:
+    formats: 'ipynb,qmd'
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.14.5
+  kernelspec:
+    display_name: R
+    language: R
+    name: ir
+eval: false
+echo: true
+---
+
+::: {.callout-important}
+
+以下の2つの問題について、Rコードを記述してください。
+
+:::
+
+
+## 問題: 動物データ（df_aniaml）を用いて、体長と体重の散布図を描画せよ
+
+```{r}
+#| label: 動物データの読み込み
+df_animal <-
+  readr::read_csv("https://raw.githubusercontent.com/uribo/tokupon_ds/main/data-raw/tokushima_zoo_animals22.csv", col_types = "ccdd")
+```
+
+```{r}
+head(df_animal)
+```
+
+- 動物データは `df_animal` としてデータフレーム形式で保存されている。
+- 体長は`body_length_cm`、体重は`weight_kg`として変数に記録されている。
+- 散布図はx軸に`body_length_cm`、y軸に`weight_kg`を与えること。
+
+
+```{r}
+# コードを記述してセルを実行
+```
+
+## 問題: 2009年から2020年の四国4県の人口の時系列での推移を適切な方法で可視化せよ。塗り分け、凡例の表示等により、グラフ上のデータがどの県を示すかわかるようにすること。
+
+```{r}
+#| eval: false
+#| echo: true
+install.packages("zipangu")
+install.packages("ssdse", 
+                 repos = c("https://uribo.r-universe.dev", "https://cloud.r-project.org"))
+```
+
+```{r}
+#| label: SSDSEデータの読み込み
+df_ssdse_b_shikoku <- 
+  ssdse::read_ssdse_b("https://www.nstac.go.jp/sys/files/SSDSE-B-2023.csv", 
+                      lang = "ja",
+                      pack = FALSE) |>
+  dplyr::filter(`都道府県` %in% c("徳島県", "香川県", "愛媛県", "高知県")) |> 
+  dplyr::select(year = `SSDSE.B.2023`, 
+                prefecture = `都道府県`,
+                population = `人口・世帯_総人口`) |> 
+  dplyr::mutate(prefecture = zipangu::convert_prefecture(prefecture, to = "roman"))
+
+head(df_ssdse_b_shikoku, n = 3)
+```
+
+```{r}
+# コードを記述してセルを実行
+```
