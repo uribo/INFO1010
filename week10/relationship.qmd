@@ -4,6 +4,7 @@ format: html
 lang: ja
 ascii: false
 keep-ipynb: true
+eval: false
 jupyter:
   jupytext:
     formats: 'ipynb,qmd'
@@ -141,7 +142,6 @@ df |>
 
 ```{r}
 #| label: くちばしの長さと体重の共分散
-#| eval: true
 cov(X, Y, use = "complete.obs")
 ```
 
