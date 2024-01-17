@@ -1,0 +1,94 @@
+---
+title: "統計データの分析"
+format: html
+lang: ja
+ascii: false
+keep-ipynb: true
+eval: false
+jupyter:
+  jupytext:
+    formats: 'ipynb,qmd'
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.14.5
+  kernelspec:
+    display_name: R
+    language: R
+    name: ir
+---
+
+独立行政法人 統計センターが公開している教育用標準データセット (SSDSE)から、`SSDSE-市区町村`（SSDSE-A）のデータをダウンロードし、分析に利用します。
+
+```{r}
+# パッケージ、データの読み込み
+library(tidyverse)
+
+# ファイル名を変更して保存した場合、適宜置き換えてください。
+df <- read_csv("SSDSE-A-2023.csv",
+               locale = locale(encoding = "CP932"))
+```
+
+```{r}
+# おまじないコード。変更せずに実行して下さい
+df <-
+  df[-c(1, 2), ]
+
+df <- 
+  df |> 
+  select(`都道府県` = Prefecture, 
+         `市区町村` = Municipality, 
+         `総人口` = A1101,
+         `医師数` = 125) |> 
+  readr::type_convert(col_types = "ccdd")
+```
+
+次にあなたのcアカウントの数値をもとにデータをランダムに抽出します。以下のコードの`set.seed()`関数の値にcアカウントの数値部分のみを入力し、実行して下さい。
+
+```{r}
+# cアカウントの数値をここに与えて下さい
+# 例）c12345678の場合
+set.seed(12345678)
+df <- 
+  df |> 
+  sample_n(size = 200)
+```
+
+総人口と医師数の散布図を描画してみましょう。
+下記のコードの `_` 部分を埋めて、適切なコードに置き換えてください。
+
+```{r}
+df |> 
+  gg____() +
+  aes(x = ____, y = _____) +
+  geom_point() +
+  labs(x = "総人口", y = "医師数")
+```
+
+## 相関分析
+
+`cor()`関数を使って、手元のデータでの総人口と医師数の相関係数を調べましょう。
+
+```{r}
+cor(df$____, df$____)
+```
+
+```
+# この結果から、総人口と医師数の間にはどのような関係があると考えられますか？（自由記述）
+```
+
+## 回帰分析
+
+`lm()`関数を使った回帰分析を行います。
+
+```{r}
+# lm(formula = y ~ x, data = data)
+lm_res <- 
+  lm(formula = ____ ~ ____, data = df)
+summary(lm_res)
+```
+
+```
+# この結果から、総人口と医師数の間にはどのような関係があると考えられますか？（自由記述）
+```

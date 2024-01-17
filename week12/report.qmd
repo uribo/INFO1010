@@ -1,0 +1,283 @@
+---
+title: "統計データの分析"
+format: html
+lang: ja
+ascii: false
+keep-ipynb: true
+eval: true
+jupyter:
+  jupytext:
+    formats: 'ipynb,qmd'
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.14.5
+  kernelspec:
+    display_name: R
+    language: R
+    name: ir
+---
+
+プログラミング言語やJupyter Notebookを利用することで、
+分析レポートの作成が容易になります。ここでは独立行政法人 統計センターが公開している教育用標準データセット (SSDSE)を用いて、統計データの分析を行います。
+
+ウェブブラウザから次のリンクにアクセスします。
+<https://www.nstac.go.jp/use/literacy/ssdse/>
+
+## データのダウンロード
+
+SSDSEにはいくつかのデータの種類（AからE）がありますが、ここでは、`SSDSE-県別推移`(SSDSE-B-2023)を用います。Excel形式、csv形式の2つのファイル形式でのダウンロードが可能ですが、**csv形式のファイルをダウンロード**します。
+
+自身の端末にファイルをダウンロードしたら、JupyterHubへもアップロードしておきましょう。
+
+## データの読み込み
+
+分析を始める前に、必要なパッケージとデータを読み込みます。
+次のコードを実行して、準備を整えましょう。
+
+```{r}
+# 日本語の都道府県名をローマ字表記に変換するために利用する
+install.packages("zipangu")
+# データ読み込み、操作、可視化などの機能を提供するパッケージ
+library(tidyverse)
+```
+
+```{r}
+# df という名前のオブジェクトにデータを格納します。
+# dfは表形式のデータを表す data frame の略称です。
+df <- 
+  # ファイル名を変更して保存した場合、`SSDSE-B-2023.csv`の部分を変更してください。
+  read_csv("SSDSE-B-2023.csv",
+           locale = locale(encoding = "CP932"))
+```
+読み込んだデータを出力してみましょう。いくつかの出力方法が利用できます。
+
+```{r}
+df
+
+head(df)
+
+glimpse(df)
+```
+
+つぎのコードブロックは「おまじない」的な処理です。
+以下の3つの処理を行っています。
+
+- 列の名前がわかりにくいので日本語の変数名を列名に当てる
+- 2020年のデータに限定する（絞り込む）
+- 分析に用いる列を選択する
+
+```{r}
+cols <- 
+  df |> 
+  slice(1L) |> 
+  unlist() |> 
+  unname()
+
+df <- 
+  df |> 
+  slice(-1L) |> 
+  type_convert(
+    col_types = cols(.default = col_double(), 
+                     Code = col_character(), 
+                     Prefecture = col_character()))
+
+df <- 
+  df |> 
+  filter(`SSDSE-B-2023` == 2020) |> 
+  set_names(cols)
+
+df <- 
+  df |> 
+  mutate(`都道府県` = zipangu::convert_prefecture(`都道府県`, to = "roman")) |> 
+  mutate(`都道府県` = str_remove(`都道府県`, "-.+"))
+
+df <- 
+  df |> 
+  select(!c(contains("（"), 
+            contains("年度"),
+            contains("地域コード"),
+            contains("のうち進学者数"), 
+            contains("年平均気温"),
+            contains("教員数"),
+            contains("在園者数"),
+            contains("卒業者数"),
+            contains("学生数"),
+            contains("児童数"),
+            contains("定員数"),
+            contains("保育士数"),
+            contains("在所児数"),
+            contains("生徒数"),
+            contains("着工新設"),
+            contains("各種学校")))
+```
+
+## 総人口と高等学校数の関係
+
+### 可視化
+
+総人口と高等学校数の関係を散布図で可視化してみましょう。
+
+```{r}
+p <- 
+  df |> 
+  ggplot() +
+  aes(`総人口`, `高等学校数`) +
+  geom_point() +
+  labs(x = "Population", 
+       y = "Number of high schools")
+
+p
+```
+
+出力した散布図からどのような関係があると考えられますか？
+また、徳島県は散布部のどの位置にありますか？
+
+これらの問いに答えるために、さらに分析を進めてみましょう。
+
+```{r}
+install.packages(c("gghighlight", "ggrepel"))
+library(ggrepel)
+library(gghighlight)
+```
+
+
+```{r}
+p2 <- 
+  p +
+  geom_text_repel(aes(label = `都道府県`))
+
+p2
+```
+
+```{r}
+p3 <- 
+  p2 +
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+```{r}
+p3 +
+  gghighlight(`都道府県` %in% c("Tokushima", "Kagawa", "Kochi", "Ehime"))
+```
+
+### 相関分析
+
+総人口と高等学校数の関係を相関分析を用いて調べてみましょう。
+相関係数は2つの変数の間にどのような関係があるかを示す指標です。
+1から-1までの値をとり、1に近いほど正の相関があることを示し、-1に近いほど負の相関があることを示します。
+
+```{r}
+cor(df$`総人口`, df$`高等学校数`)
+```
+
+得られた相関係数から、総人口と高等学校数の間にはどのような関係があると考えられますか？
+
+## 高齢化率
+
+### データの加工
+
+ここでは「高齢化率」の定義を次のようにします。
+
+$$
+\text{高齢化率} = \frac{\text{65歳以上の人口}}{\text{総人口}} \times 100
+$$
+```{r}
+df <- 
+  df |> 
+  mutate(`高齢化率` = `65歳以上人口` / `総人口` * 100,
+         .after = `総人口`)
+```
+
+散布図により、総人口と高齢化率の関係を可視化してみます。
+
+```{r}
+p <- 
+  df |> 
+  ggplot() +
+  aes(`総人口`, `高齢化率`) +
+  geom_point() +
+  labs(x = "Population", 
+       y = "Aging rate")
+
+p
+```
+
+```{r}
+p +
+  scale_x_log10() +
+  scale_y_log10() +
+  gghighlight(`都道府県` %in% c("Tokushima", "Kagawa", "Kochi", "Ehime")) +
+  geom_text_repel(aes(label = `都道府県`))
+```
+
+
+### 回帰分析
+
+回帰分析は、変数の間にどのような関係があるかを調べるために用いられる手法です。総人口と高等学校数の関係を回帰分析を用いて調べてみましょう。
+
+```{r}
+cor(df |> 
+      select(!c(`都道府県`))) |> 
+  as.data.frame() |>  
+  tibble::rownames_to_column("項目") |> 
+  tibble::as_tibble() |> 
+  select(`項目`, `高齢化率`) |> 
+  arrange(`高齢化率`)
+```
+```{r}
+p <- 
+  df |> 
+  ggplot() +
+  aes(`出生数`, `高齢化率`) +
+  geom_point() +
+  labs(x = "Births", 
+       y = "Aging rate")
+p
+```
+
+
+```{r}
+p2 <- 
+  p + 
+  geom_line(stat = "smooth", method = "lm")
+p2
+```
+
+```{r}
+p3 <- 
+  p2 +
+  geom_text_repel(aes(label = `都道府県`))
+p3
+```
+
+```{r}
+lm_res <- 
+  lm(`高齢化率` ~ `出生数`, data = df)
+summary(lm_res)
+```
+
+```{r}
+predict(lm_res)
+```
+
+
+
+```{r}
+df |> 
+  select(`都道府県`, `出生数`, `高齢化率`) |> 
+  mutate(fitted_value = predict(lm_res),
+         residual = `高齢化率` - fitted_value) |> 
+  ggplot() +
+  aes(`出生数`, `高齢化率`) +
+  geom_point() +
+  geom_line(aes(y = fitted_value)) +
+  labs(x = "Births", 
+       y = "Aging rate") +
+  gghighlight(residual > 0) +
+  geom_text_repel(aes(label = `都道府県`), 
+                  max.overlaps = Inf)
+```
+
