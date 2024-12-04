@@ -1,5 +1,5 @@
 ---
-title: 【課題】Rでのグラフ作成の基礎
+title: 【課題】データの特徴を表現する方法を理解する
 format: html
 keep-ipynb: true
 jupyter:
@@ -14,18 +14,16 @@ jupyter:
     display_name: R
     language: R
     name: ir
-eval: false
-echo: true
 ---
 
 ::: {.callout-important}
 
-以下の2つの問題について、Rコードを記述してください。
+以下の2つの問題について、回答結果をセルに記述してください。なお必要に応じてRコードも示してください。
 
 :::
 
 
-## 問題: 動物データ（df_aniaml）を用いて、体長と体重の散布図を描画せよ
+## 問題: 動物データに対して要約統計量を求める関数を適用し、体長の中央値、体重の（不偏）標準偏差を求めよ
 
 ```{r}
 #| label: 動物データの読み込み
@@ -39,38 +37,25 @@ head(df_animal)
 
 - 動物データは `df_animal` としてデータフレーム形式で保存されている。
 - 体長は`body_length_cm`、体重は`weight_kg`として変数に記録されている。
-- 散布図はx軸に`body_length_cm`、y軸に`weight_kg`を与えること。
 
+Rで要約統計量を求める関数は`summary()`である。数値からなる変数については最小値や最大値、中央値、平均値などの情報が得られる。
+また`summary()`で得られない標準偏差などの要約統計量についても個別に求める関数がRには用意されている。
 
 ```{r}
-# コードを記述してセルを実行
+# コードを記述して実行
 ```
 
-## 問題: 2009年から2020年の四国4県の人口の時系列での推移を適切な方法で可視化せよ。塗り分け、凡例の表示等により、グラフ上のデータがどの県を示すかわかるようにすること。
+## 問題: データの特徴
 
-```{r}
-#| eval: false
-#| echo: true
-install.packages("zipangu")
-install.packages("ssdse", 
-                 repos = c("https://uribo.r-universe.dev", "https://cloud.r-project.org"))
+データをその特性に応じて分類すると、量的データ（量的変数）と質的データ（質的変数）に分けられます 。これらのデータの種類はさらに、尺度水準という観点から、名義尺度、順序尺度、間隔尺度、比例尺度に分類されます 。次に示す５種類のデ
+ータについて、順序尺度であるものを1つ選んでください。
+
+回答のみを残し、他の選択肢については削除またはコメントアウト（行頭に`#`を追加）してください。
+
 ```
-
-```{r}
-#| label: SSDSEデータの読み込み
-df_ssdse_b_shikoku <- 
-  ssdse::read_ssdse_b("https://www.nstac.go.jp/sys/files/SSDSE-B-2023.csv", 
-                      lang = "ja",
-                      pack = FALSE) |>
-  dplyr::filter(`都道府県` %in% c("徳島県", "香川県", "愛媛県", "高知県")) |> 
-  dplyr::select(year = `SSDSE.B.2023`, 
-                prefecture = `都道府県`,
-                population = `人口・世帯_総人口`) |> 
-  dplyr::mutate(prefecture = zipangu::convert_prefecture(prefecture, to = "roman"))
-
-head(df_ssdse_b_shikoku, n = 3)
-```
-
-```{r}
-# コードを記述してセルを実行
+1. あるクラスの学生の試験の点数（例 10点、8点、5点、6点、8点）
+2. 星座の並び (牡羊座3月から魚座2月までの月並び)
+3. 講義への理解度（例 よくわかった、ある程度わかった、半分くらいはわかった、あまりわからなかった、全然わからなかった）
+4. 血液型（例 A型、B型、O型、AB型）
+5. 8月の日最高気温（例 30.2℃、33.6℃、29.8℃、29.1℃、30.1℃）
 ```

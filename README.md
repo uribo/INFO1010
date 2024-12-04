@@ -17,7 +17,7 @@
 | 6 | AI活用の現状と展望 | [06_AI活用の現状と展望.pdf](slide/06_AI活用の現状と展望.pdf) |
 | 7 | プログラミング基礎 | [07_プログラミング基礎.pdf](slide/07_プログラミング基礎.pdf), [r_introduction.ipynb](week07/r_introduction.ipynb) |
 | 8 | 再現可能性 | |
-| 9 | データの記述 | |
+| 9 | データの記述 | [09_データの記述.pdf](slide/09_データの記述.pdf), [0901_dataframe.ipynb](week09/0901_dataframe.ipynb), [0902_summary_statistics.ipynb](week09/0902_summary_statistics.ipynb) |
 | 10 | データの可視化 | |
 | 11 | データの関係性 | |
 | 12 | データのモデリング | |
