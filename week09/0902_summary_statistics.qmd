@@ -28,12 +28,6 @@ library(tidyverse)
 library(palmerpenguins) # ペンギンデータを利用
 ```
 
-```{r}
-#| label: 動物データの読み込み
-df_animal <-
-  readr::read_csv("https://raw.githubusercontent.com/uribo/tokupon_ds/main/data-raw/tokushima_zoo_animals22.csv", col_types = "ccdd")
-```
-
 一般に、データ分析で扱うデータの件数は数百から数十万件と膨大です。このような大量のデータを全て目視で確認することは困難です。そのため、データの特徴を理解し、全体像を把握することが重要になります。手法としては、平均値や中央値などの**代表値**によるデータの集約、分散、標準偏差による**ばらつき**を用いた分布の推定などがあります。また、グラフ等を用いたデータ可視化もデータの特徴を把握するための手法の一つです。
 
 ```{r}
