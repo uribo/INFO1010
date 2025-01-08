@@ -40,7 +40,7 @@ library(dplyr, warn.conflicts = FALSE)
 
 ```{r}
 # ペンギンデータの読み込み
-penguins <- 
+penguins <-
   readr::read_csv("https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv",
                   col_types = "ccddddcd")
 ```
@@ -48,7 +48,7 @@ penguins <-
 ```{r}
 #| fig-cap: "くちばしが長い個体ほど体重が大きい傾向にある"
 ggplot(data = penguins) +
-  aes(bill_length_mm, body_mass_g) + 
+  aes(bill_length_mm, body_mass_g) +
   geom_point()
 ```
 
@@ -69,7 +69,7 @@ $$
 共分散の求め方を一つ一つ読み解いてみましょう。まず、この式で使われる記号を確認します。
 
 - $\mathrm{cov}(X, Y)$ : 変数 $X$ と変数 $Y$ の共分散
-- $n$ : データの件数 
+- $n$ : データの件数
 - $x_i$ および $y_i$ : 変数 $X$ 、変数 $Y$ における $i$ 番目のデータ
 - $\bar{x}$ と $\bar{y}$ : 変数 $X$ 、変数 $Y$ それぞれの平均値
 
@@ -78,9 +78,9 @@ $$
 ```{r}
 # ペンギンデータからくちばしの長さと体重の2つの変数を選択し、
 # 欠損していないデータのみを抽出
-df <- 
-  penguins |> 
-  select(bill_length_mm, body_mass_g) |> 
+df <-
+  penguins |>
+  select(bill_length_mm, body_mass_g) |>
   filter(!is.na(bill_length_mm), !is.na(body_mass_g))
 ```
 
@@ -98,10 +98,15 @@ mean_y <- mean(Y)
 # X - mean_x でXの偏差を求める
 # Xの各値がXの平均値からどの程度ズレているか
 head(X - mean_x)
+```
+
+```{r}
 # Yについても同様に偏差を求め、Xの偏差とYの偏差の積を求める
 step1_result <- (X - mean_x) * (Y - mean_y)
 head(step1_result)
+```
 
+```{r}
 # 偏差の積を足し合わせ、データの件数で割る（平均値を求める）
 # --> 共分散
 step2_result <- sum(step1_result) / nrow(df)
@@ -117,12 +122,12 @@ sum(step1_result) / (nrow(df) -1)
 ```{r}
 # 別の求め方
 # 平均、偏差を求める
-df <- 
-  df |> 
+df <-
+  df |>
   mutate(across(everything(),
-                .fns = ~ mean(.x, na.rm = TRUE), 
-                .names = "{.col}_mean")) |> 
-  rowwise() |> 
+                .fns = ~ mean(.x, na.rm = TRUE),
+                .names = "{.col}_mean")) |>
+  rowwise() |>
   mutate(
     bill_length_deviation = bill_length_mm - bill_length_mm_mean,
     body_mass_deviation = body_mass_g - body_mass_g_mean)
@@ -131,10 +136,10 @@ head(df)
 ```
 
 ```{r}
-df |> 
-  transmute(deviation_cross = bill_length_deviation * body_mass_deviation) |> 
-  ungroup() |> 
-  pull(deviation_cross) |> 
+df |>
+  transmute(deviation_cross = bill_length_deviation * body_mass_deviation) |>
+  ungroup() |>
+  pull(deviation_cross) |>
   sum(na.rm = TRUE) / nrow(df)
 ```
 
@@ -224,7 +229,7 @@ cor.test(df$bill_length_mm, df$body_mass_g)
 
 相関係数は関係の強さを示す指標であって変数間の因果関係を示すものではありません。どんな変数間であろうと相関係数は必ず出る点も気にしておきましょう。2つの変数に対する関係として、片方の変数からもう片方の変数を説明することには回帰分析を実行する必要があります。
 
-<!-- 
+<!--
 外れ値に注意、2変数間の関係が直線的でないとき（アンスコムの例）
 
 因果関係との違い
@@ -257,4 +262,3 @@ corrplot(cor(penguins[, c("bill_length_mm", "bill_depth_mm", "flipper_length_mm"
 ```
 
 出力される円の大きさとその色を比較することで、相関係数の値を直感的に理解することができます。ここでは円の大きさは、相関係数の絶対値の大きさを表します。円の色は、相関係数の符号を表します。青色は正の相関を、赤色は負の相関を表します。円の色の濃さは、相関係数の絶対値の大きさを表します。円の色の濃さが濃いほど相関係数の絶対値が大きいことを表します。
-

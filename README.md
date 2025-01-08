@@ -19,9 +19,9 @@
 | 8 | 再現可能性 | |
 | 9 | データの記述 | [09_データの記述.pdf](slide/09_データの記述.pdf), [0901_dataframe.ipynb](week09/0901_dataframe.ipynb), [0902_summary_statistics.ipynb](week09/0902_summary_statistics.ipynb) |
 | 10 | データの可視化 | [10_データの可視化.pdf](slide/10_データの可視化.pdf), [graph.ipynb](week10/graph.ipynb) |
-| 11 | データの関係性 | |
-| 12 | データのモデリング | |
-| 13 | データサイエンス応用 | |
+| 11 | データサイエンス応用 | |
+| 12 | データの関係性 | [12_データの関係性.pdf](slide/12_データの関係性.pdf), [relationship.ipynb](week12/relationship.ipynb) |
+| 13 | データのモデリング | |
 | 14 | プレゼンテーション1 | |
 | 15 | プレゼンテーション2 | |
 | 16 | まとめ・振り返り | |
