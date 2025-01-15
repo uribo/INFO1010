@@ -35,29 +35,39 @@ plot(temperature, icecream_sales)
 ```
 
 ```{r}
+#| eval: false
+#| echo: true
 # 単回帰モデルの構築
 # lm()関数の引数に 目的変数 ~ 説明変数 の形式で指定する
-model <- lm(formula = icecream_sales ~ temperature)
+model <- lm(formula = <目的変数> ~ <説明変数>)
 ```
 
 ```{r}
+#| eval: false
+#| echo: true
 # intercept... 切片
 # coefficient... 傾き（係数）
 coefficients(model)
 ```
 
 ```{r}
+#| eval: false
+#| echo: true
 # 回帰直線の追加
 plot(temperature, icecream_sales)
 abline(model)
 ```
 
 ```{r}
+#| eval: false
+#| echo: true
 # 新たなデータに対する予測
-predict(model, data.frame(temperature = 30))
+predict(model, data.frame(temperature = _))
 ```
 
 ```{r}
+#| eval: false
+#| echo: true
 # p値を含む結果の出力
 summary(model)
 ```
@@ -65,10 +75,12 @@ summary(model)
 ### 重回帰モデル
 
 ```{r}
+#| eval: false
+#| echo: true
 # 重回帰モデルの構築
 humidity <- c(0.65, 0.8, 0.75, 0.85, 0.9, 0.8)
 wind_speed <- c(2, 3, 4, 6, 3, 1)
-model <- lm(icecream_sales ~ temperature + humidity + wind_speed)
+model <- lm(<モデル式>)
 
 coefficients(model)
 
@@ -76,6 +88,8 @@ summary(model)
 ```
 
 ## 一般化線形モデル
+
+正規分布以外の確率分布に従うデータ（例えばカウントデータ）をモデリングで扱う
 
 ```{r}
 # 『データ解析のための統計モデリング入門』（久保2012）からデータを利用
@@ -133,6 +147,7 @@ ggplot(d) +
                                 "Treatment" = "#0cb3d1"))
 ```
 
+種子数はポアソン分布に従うと仮定をおく。
 
 ```{r}
 model <- glm(formula = y ~ x + f, data = d, family = poisson)
@@ -142,4 +157,68 @@ summary(model)
 ```{r}
 predict(model, newdata = data.frame(x = 12, f = "Control"), type = "response")
 predict(model, newdata = data.frame(x = 12, f = "Treatment"), type = "response")
+```
+
+### ロジスティック回帰
+
+```{r}
+df_weather <-
+  readr::read_csv(
+    "https://raw.githubusercontent.com/uribo/ds4beginners/refs/heads/main/weather.csv",
+    col_types = readr::cols(
+      weather = readr::col_character(),
+      pressure = readr::col_double(),
+      humidity = readr::col_double(),
+      temperature = readr::col_double()
+    )
+  ) |>
+  dplyr::mutate(weather = as.factor(weather) |> forcats::fct_rev())
+```
+
+```{r}
+# 「雨」を1、「雨以外」を0として扱う
+contrasts(df_weather$weather)
+```
+```{r}
+#| eval: false
+#| echo: true
+# ロジスティック回帰モデルの作成
+model <- 
+  glm(<モデル式>, 
+      data = df_weather, 
+      family = <確率分布>)
+
+summary(model)
+```
+
+```{r}
+# 散布図を描画し、データの傾向を確認
+p <- 
+  ggplot(df_weather) +
+  aes(humidity, as.numeric(weather)-1) +
+  geom_point() +
+  ylab("weather")
+
+p + 
+  stat_smooth(
+  method = "glm", 
+  method.args = list(family = "binomial"), 
+  se = FALSE, 
+  color = "#57467b")
+```
+
+新たなデータへの予測を行う
+
+```{r}
+#| eval: false
+#| echo: true
+new_weather <- data.frame(
+  temperature = 14.1, 
+  humidity = 88, 
+  pressure = 1001)
+
+predict(
+  model, 
+  newdata = new_weather, 
+  type = "response")
 ```
