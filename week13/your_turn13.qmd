@@ -1,0 +1,71 @@
+---
+title: 【課題】データのモデリング
+format: html
+keep-ipynb: true
+execute: 
+  eval: true
+  echo: true
+jupyter:
+  jupytext:
+    formats: 'ipynb,qmd'
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.14.5
+  kernelspec:
+    display_name: R
+    language: R
+    name: ir
+---
+
+::: {.callout-important}
+
+以下の3つの問題文を読み、Rコードを記述、適当な選択肢を選択してください。
+
+:::
+
+## 問題: 線形モデルの実行
+
+6点
+
+以下のコードを実行し、ペンギンデータ(`penguins`)を読み込みます。読み込んだペンギンデータから、体重 `body_mass_g`を目的変数に、くちばしの長さ `bill_length_mm`を説明変数とした線形モデル(linear model)を実行するRコードを記述し、結果を出力してください。また、線形モデルの結果から言えることを選択肢の中から一つ選んでください（不適切と思われる選択肢を削除し、適切なものを残してください）。
+
+```{r}
+#| eval: false
+#| echo: true
+# ペンギンデータの読み込み
+penguins <- 
+  readr::read_csv("https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv",
+                  col_types = "ccddddcd")
+```
+
+```{r}
+# Rコードを記述
+# 線形モデルの実行コードを記述します
+# ヒント: formulaとdataを引数にもつ関数を使う
+# formula引数には 目的変数 ~ 説明変数
+# data引数には対象のデータを指定する
+```
+
+
+回答のみを残し、他の選択肢については削除またはコメントアウト（行頭に`#`を追加）してください。
+
+```
+1. くちばしの長さ (`bill_length_mm`)は翼の長さ (`flipper_length_mm`)よりも体重(`body_mass_g`)に対する影響が強い
+2. くちばしの長さが1mm増えると、体重はおよそ87g増える
+3. くちばしの長さが増えると体重は減少する
+```
+
+
+## 問題: 一般化線形モデル
+
+2点
+
+一般化線形モデルに対する記述として**不適切なもの**を選択肢の中から一つ選んでください。
+
+```
+1. 一般化線形モデルは、（正規分布以外の確率分布に対応した）線形モデルの一般化である
+2. 一般化線形モデルは、線形モデルと同様に説明変数と目的変数の関係を表現する
+3. 一般化線形モデルは最小二乗法を用いてパラメータを推定する
+```

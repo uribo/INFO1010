@@ -21,7 +21,7 @@
 | 10 | データの可視化 | [10_データの可視化.pdf](slide/10_データの可視化.pdf), [graph.ipynb](week10/graph.ipynb) |
 | 11 | データサイエンス応用 | |
 | 12 | データの関係性 | [12_データの関係性.pdf](slide/12_データの関係性.pdf), [relationship.ipynb](week12/relationship.ipynb) |
-| 13 | データのモデリング | |
+| 13 | データのモデリング | [13_データのモデリング.pdf](slide/13_データのモデリング.pdf), [model.ipynb](week13/model.ipynb) |
 | 14 | プレゼンテーション1 | |
 | 15 | プレゼンテーション2 | |
 | 16 | まとめ・振り返り | |

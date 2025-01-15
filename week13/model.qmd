@@ -1,0 +1,145 @@
+---
+title: データのモデリング
+format: html
+lang: ja
+ascii: false
+keep-ipynb: true
+jupyter:
+  jupytext:
+    formats: 'ipynb,qmd'
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.14.5
+  kernelspec:
+    display_name: R
+    language: R
+    name: ir
+---
+
+## 線形モデル
+
+### 単回帰モデル
+
+```{r}
+# 気温のデータを作成
+temperature <- seq(18, 40, 4)
+# アイスクリームの売り上げのデータを作成
+icecream_sales <- c(28, 45, 72, 82, 96, 100)
+```
+
+```{r}
+# 散布図の作成
+plot(temperature, icecream_sales)
+```
+
+```{r}
+# 単回帰モデルの構築
+# lm()関数の引数に 目的変数 ~ 説明変数 の形式で指定する
+model <- lm(formula = icecream_sales ~ temperature)
+```
+
+```{r}
+# intercept... 切片
+# coefficient... 傾き（係数）
+coefficients(model)
+```
+
+```{r}
+# 回帰直線の追加
+plot(temperature, icecream_sales)
+abline(model)
+```
+
+```{r}
+# 新たなデータに対する予測
+predict(model, data.frame(temperature = 30))
+```
+
+```{r}
+# p値を含む結果の出力
+summary(model)
+```
+
+### 重回帰モデル
+
+```{r}
+# 重回帰モデルの構築
+humidity <- c(0.65, 0.8, 0.75, 0.85, 0.9, 0.8)
+wind_speed <- c(2, 3, 4, 6, 3, 1)
+model <- lm(icecream_sales ~ temperature + humidity + wind_speed)
+
+coefficients(model)
+
+summary(model)
+```
+
+## 一般化線形モデル
+
+```{r}
+# 『データ解析のための統計モデリング入門』（久保2012）からデータを利用
+# 植物の種子数と体サイズについての架空のデータ
+d <- 
+  readr::read_csv("https://kuboweb.github.io/-kubo/stat/iwanamibook/fig/poisson/data3a.csv",
+                  col_types = "ddc") |> 
+  dplyr::mutate(f = dplyr::case_match(
+    f,
+    "C" ~ "Control",
+    "T" ~ "Treatment"))
+
+head(d)
+# y... 植物の種子数
+# x... 体サイズ
+# f... 施肥処理（Control... 処理なし、Treatment... 処理あり）
+```
+
+```{r}
+#| label: 体サイズと種子数の散布図
+library(ggplot2)
+ggplot(d) +
+  aes(x, y) +
+  geom_point(aes(color = f)) +
+  xlab("Size") +
+  ylab("Number of seed") +
+  scale_color_manual(values = c("Control" = "#f25d02", 
+                                "Treatment" = "#0cb3d1"))
+```
+
+```{r}
+#| label: 施肥処理の違いに応じた種子数の箱ひげ図
+ggplot(d) +
+  aes(f, y) +
+  geom_boxplot(aes(color = f),
+               show.legend = FALSE) +
+  xlab("Size") +
+  ylab("Number of seed") +
+  scale_color_manual(values = c("Control" = "#f25d02", 
+                                "Treatment" = "#0cb3d1"))
+```
+
+```{r}
+#| label: 施肥処理の違いに応じた種子数の蜂群図（箱ひげ図の改良）
+#| eval: false
+#| echo: false
+library(ggbeeswarm)
+ggplot(d) +
+  aes(f, y) +
+  geom_quasirandom(aes(color = f),
+               show.legend = FALSE) +
+  xlab("Size") +
+  ylab("Number of seed") +
+  scale_color_manual(values = c("Control" = "#f25d02", 
+                                "Treatment" = "#0cb3d1"))
+```
+
+
+```{r}
+model <- glm(formula = y ~ x + f, data = d, family = poisson)
+summary(model)
+```
+
+```{r}
+predict(model, newdata = data.frame(x = 12, f = "Control"), type = "response")
+predict(model, newdata = data.frame(x = 12, f = "Treatment"), type = "response")
+```
